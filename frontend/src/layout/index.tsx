@@ -48,7 +48,8 @@ export default function LayoutApp({children}) {
                 position: 'fixed',
                 left: drawerWidth,
                 right: drawerWidth,
-                padding: 1
+                padding: 1,
+                paddingTop: 3
             }}>
                 <Toolbar />
                 {children}
