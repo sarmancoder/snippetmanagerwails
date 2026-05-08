@@ -1,6 +1,8 @@
 import { Editor, OnMount } from '@monaco-editor/react'
 import { Box, Card, CardContent, CardHeader, TextField } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
+import Select from "react-select";
+import { languageScopes } from '../../config';
 
 export default function DualEditorPage() {
     const bodyEditor = useRef<any>(null) // Guardaremos la instancia del editor aquí
@@ -57,36 +59,41 @@ export default function DualEditorPage() {
         }}>
             {/* Columna Izquierda: Inputs */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <TextField 
-                    fullWidth 
-                    label="Prefijo" 
+                <TextField
+                    fullWidth
+                    label="Prefijo"
                     value={prefix}
-                    onChange={(e) => setPrefix(e.target.value)} 
+                    onChange={(e) => setPrefix(e.target.value)}
                 />
                 <TextField
                     value={description}
-                    fullWidth 
-                    label="Descripción" 
-                    onChange={(e) => setDescription(e.target.value)} 
+                    fullWidth
+                    label="Descripción"
+                    onChange={(e) => setDescription(e.target.value)}
                 />
                 <Card variant="outlined">
                     <CardHeader title={'Contenido del snippet'}
                         action={(
-                            <>
-                                <TextField size='small'
-                                    value={scopes}
-                                    fullWidth 
-                                    label="Scopes" 
-                                    onChange={(e) => setScopes(e.target.value)} 
+                            <Box>
+                                <Select
+                                    options={languageScopes}
+                                    isMulti
+                                    menuPortalTarget={document.body}
+                                    styles={{
+                                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                        container: (base) => ({ ...base, width: '340px' })
+                                    }}
+                                    value={languageScopes.filter(a => scopes.split(',').includes(a.value))}
+                                    onChange={(c) => setScopes(c.map((a: any) => a.value).join(','))}
                                 />
-                            </>
+                            </Box>
                         )}
                     />
                     <CardContent>
-                        <Editor 
+                        <Editor
                             language={scopes.length == 0 ? 'plaintext' : scopes.split(',')[0]}
                             theme='vs-dark'
-                            height={'350px'} 
+                            height={'350px'}
                             onChange={(value) => setBody(value || '')}
                             onMount={handleLeftEditorDidMount}
                         />
@@ -96,10 +103,10 @@ export default function DualEditorPage() {
 
             {/* Columna Derecha: Resultado JSON */}
             <Box>
-                <Editor 
+                <Editor
                     language="json" // Cambiado a JSON para mejor resaltado
-                    theme='vs-dark' 
-                    height={'100%'} 
+                    theme='vs-dark'
+                    height={'100%'}
                     options={{ minimap: { enabled: false } }}
                     onMount={handleEditorDidMount}
                 />
