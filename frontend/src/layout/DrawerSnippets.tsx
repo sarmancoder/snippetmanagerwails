@@ -4,7 +4,7 @@ import { Box, colors, List, ListItem, ListItemButton, ListItemText, Toolbar, But
 import { useAppContext } from '../AppSnippetsContext'
 
 export default function DrawerSnippets() {
-    const { snippetsList, currentPathFile, setCurrentSnippetKey } = useAppContext()
+    const { snippetsList, currentPathFile, currentSnippetKey, setCurrentSnippetKey } = useAppContext()
     return (
         <Box sx={{
             bgcolor: colors.grey[300],
@@ -19,7 +19,7 @@ export default function DrawerSnippets() {
             <Toolbar />
             <List>
                 {snippetsList.map((snippet, index) => (
-                    <ListItemButton title={snippet.description} key={index} onClick={() => {
+                    <ListItemButton selected={currentSnippetKey == snippet.key} title={snippet.description} key={index} onClick={() => {
                         setCurrentSnippetKey(snippet.key)
                     }}>
                         <ListItemText primary={snippet.prefix} secondary={

@@ -8,6 +8,7 @@ type SnippetType = { body: string[], scope: string, description: string, prefix:
 type SnippetArrayElem = SnippetType & {key: string}
 
 function useFetchData() {
+    const [saved, setSaved] = useState(true)
     const [currentPathFile, setCurrentPathFile] = useState('');
     const [currentPathContent, setCurrentPathContent] = useState('');
     const [snippetsList, setSnippetsList] = useState<SnippetArrayElem[]>([])
@@ -28,7 +29,7 @@ function useFetchData() {
     return {
         currentPathFile, setCurrentPathFile,
         currentPathContent, setCurrentPathContent,
-        snippetsList,
+        snippetsList, saved, setSaved,
         setCurrentSnippetKey, currentSnippetKey
     };
 }

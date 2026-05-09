@@ -1,10 +1,7 @@
-import { colors } from '@mui/material';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import { drawerWidth } from '../config';
+import MyAppBar from './AppBar';
 import DrawerFiles from './DrawerFiles';
 import DrawerSnippets from './DrawerSnippets';
 
@@ -13,14 +10,7 @@ export default function LayoutApp({children}) {
     return (
         <div id='App'>
             <Box sx={{ flexGrow: 1 }}>
-                <AppBar position="fixed">
-                    <Toolbar>
-                        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            AiSnippets
-                        </Typography>
-                        <Button color="inherit">Login</Button>
-                    </Toolbar>
-                </AppBar>
+                <MyAppBar />
             </Box>
             <DrawerFiles />
             <DrawerSnippets />

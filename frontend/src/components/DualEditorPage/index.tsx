@@ -6,9 +6,10 @@ import { languageScopes } from '../../config';
 import { useAppContext } from '../../AppSnippetsContext';
 
 export default function DualEditorPage() {
-    const {snippetsList, currentSnippetKey} = useAppContext()
-    const bodyEditor = useRef<any>(null) // Guardaremos la instancia del editor aquí
-    const jsonResultRef = useRef<any>(null) // Guardaremos la instancia del editor aquí
+    const {snippetsList, currentSnippetKey, setSaved} = useAppContext()
+
+    const bodyEditor = useRef<any>(null)
+    const jsonResultRef = useRef<any>(null)
 
     const [prefix, setPrefix] = useState('')
     const [description, setDescription] = useState('')
@@ -57,6 +58,8 @@ export default function DualEditorPage() {
             body: body.split('\n')
         }
         // setJsonSnippet(newSnippet)
+
+        setSaved(false)
 
         // Actualizar el valor del editor directamente si la instancia existe
         if (jsonResultRef.current) {
