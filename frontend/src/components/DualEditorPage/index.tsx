@@ -3,10 +3,11 @@ import { Box, Card, CardContent, CardHeader, TextField } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import Select from "react-select";
 import { languageScopes } from '../../config';
-import { useAppContext } from '../../AppSnippetsContext';
+import { SnippetType, useAppContext } from '../../AppSnippetsContext';
+import { areSnippetsEqual, isEmptySnippet } from '../../utils';
 
 export default function DualEditorPage() {
-    const {snippetsList, currentSnippetKey, setSaved} = useAppContext()
+    const {snippetsList, currentSnippetKey, activeSnippet, setsaved} = useAppContext()
 
     const bodyEditor = useRef<any>(null)
     const jsonResultRef = useRef<any>(null)
@@ -15,6 +16,25 @@ export default function DualEditorPage() {
     const [description, setDescription] = useState('')
     const [scopes, setScopes] = useState('')
     const [body, setBody] = useState('')
+
+    useEffect(() => {
+        const newSnippet = {
+            prefix, description, scopes,
+            body: body.split('\n')
+        }
+        
+        const currentSnippet = {body: body.split('\n'), scope: scopes, description, prefix}
+        const areEqual = activeSnippet && !areSnippetsEqual(currentSnippet, activeSnippet as SnippetType)
+        if (!isEmptySnippet(currentSnippet) && areEqual) {
+            setsaved(false)
+        }
+
+        // Actualizar el valor del editor directamente si la instancia existe
+        if (jsonResultRef.current) {
+            const jsonString = JSON.stringify(newSnippet, null, 2)
+            jsonResultRef.current.setValue(jsonString)
+        }
+    }, [prefix, description, scopes, body])
 
     useEffect(() => {
         const snippet = snippetsList.find(a => a.key == currentSnippetKey)
@@ -51,22 +71,6 @@ export default function DualEditorPage() {
             bodyEditor.current.setValue((infoJSON.body ?? []).join('\n'))
         });
     }
-
-    useEffect(() => {
-        const newSnippet = {
-            prefix, description, scopes,
-            body: body.split('\n')
-        }
-        // setJsonSnippet(newSnippet)
-
-        setSaved(false)
-
-        // Actualizar el valor del editor directamente si la instancia existe
-        if (jsonResultRef.current) {
-            const jsonString = JSON.stringify(newSnippet, null, 2)
-            jsonResultRef.current.setValue(jsonString)
-        }
-    }, [prefix, description, scopes, body])
 
     return (
         <Box sx={{

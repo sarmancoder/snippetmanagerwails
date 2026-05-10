@@ -1,18 +1,23 @@
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { LeerArchivo } from '../wailsjs/go/main/AdministradorArchivos';
+import { isEmptySnippet } from './utils';
 
 const MyContext = createContext<any>(null);
 
-type SnippetType = { body: string[], scope: string, description: string, prefix: string }
+export type SnippetType = { body: string[], scope: string, description: string, prefix: string }
 type SnippetArrayElem = SnippetType & {key: string}
 
 function useFetchData() {
-    const [saved, setSaved] = useState(true)
     const [currentPathFile, setCurrentPathFile] = useState('');
     const [currentPathContent, setCurrentPathContent] = useState('');
     const [snippetsList, setSnippetsList] = useState<SnippetArrayElem[]>([])
     const [currentSnippetKey, setCurrentSnippetKey] = useState('')
+    const [saved, setsaved] = useState(true)
+
+    const activeSnippet = useMemo(() => {
+        return snippetsList.find(a => a.key == currentSnippetKey)
+    }, [currentSnippetKey])
 
     useEffect(() => {
         LeerArchivo(currentPathFile).then(r => {
@@ -29,7 +34,7 @@ function useFetchData() {
     return {
         currentPathFile, setCurrentPathFile,
         currentPathContent, setCurrentPathContent,
-        snippetsList, saved, setSaved,
+        snippetsList, saved, setsaved, activeSnippet,
         setCurrentSnippetKey, currentSnippetKey
     };
 }
