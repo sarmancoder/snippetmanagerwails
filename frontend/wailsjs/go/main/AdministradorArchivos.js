@@ -6,6 +6,10 @@ export function AbrirCarpetaEnExplorador(arg1) {
   return window['go']['main']['AdministradorArchivos']['AbrirCarpetaEnExplorador'](arg1);
 }
 
+export function EscribirArchivo(arg1, arg2) {
+  return window['go']['main']['AdministradorArchivos']['EscribirArchivo'](arg1, arg2);
+}
+
 export function LeerArchivo(arg1) {
   return window['go']['main']['AdministradorArchivos']['LeerArchivo'](arg1);
 }

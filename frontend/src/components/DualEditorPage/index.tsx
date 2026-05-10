@@ -7,7 +7,7 @@ import { SnippetType, useAppContext } from '../../AppSnippetsContext';
 import { areSnippetsEqual, isEmptySnippet } from '../../utils';
 
 export default function DualEditorPage() {
-    const {snippetsList, currentSnippetKey, activeSnippet, setsaved} = useAppContext()
+    const {snippetsList, currentSnippetKey, setSnippetEditing, activeSnippet, setsaved} = useAppContext()
 
     const bodyEditor = useRef<any>(null)
     const jsonResultRef = useRef<any>(null)
@@ -27,6 +27,7 @@ export default function DualEditorPage() {
         const areEqual = activeSnippet && !areSnippetsEqual(currentSnippet, activeSnippet as SnippetType)
         if (!isEmptySnippet(currentSnippet) && areEqual) {
             setsaved(false)
+            setSnippetEditing({prefix, description, scope: scopes, body: body.split('\n')})
         }
 
         // Actualizar el valor del editor directamente si la instancia existe

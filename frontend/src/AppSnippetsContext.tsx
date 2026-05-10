@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { LeerArchivo } from '../wailsjs/go/main/AdministradorArchivos';
+import { EscribirArchivo, LeerArchivo } from '../wailsjs/go/main/AdministradorArchivos';
 import { isEmptySnippet } from './utils';
 
 const MyContext = createContext<any>(null);
@@ -14,6 +14,12 @@ function useFetchData() {
     const [snippetsList, setSnippetsList] = useState<SnippetArrayElem[]>([])
     const [currentSnippetKey, setCurrentSnippetKey] = useState('')
     const [saved, setsaved] = useState(true)
+    const [snippetEditing, setSnippetEditing] = useState<SnippetType>({
+        body: [],
+        scope: '',
+        description: '',
+        prefix: ''
+    })
 
     const activeSnippet = useMemo(() => {
         return snippetsList.find(a => a.key == currentSnippetKey)
@@ -35,7 +41,20 @@ function useFetchData() {
         currentPathFile, setCurrentPathFile,
         currentPathContent, setCurrentPathContent,
         snippetsList, saved, setsaved, activeSnippet,
-        setCurrentSnippetKey, currentSnippetKey
+        setCurrentSnippetKey, currentSnippetKey,
+        snippetEditing, setSnippetEditing,
+        async saveSnippet() {
+            const snippetObj = snippetsList.reduce((acc, {key, ...curr}) => {
+                acc[key] = key == currentSnippetKey ? snippetEditing : curr
+                return acc
+            }, {})
+            const jsonString = JSON.stringify(snippetObj, null, 4);
+            await EscribirArchivo(currentPathFile, jsonString)
+            setSnippetsList(snippetsList.map(a => {
+                if (a.key == currentSnippetKey) return snippetEditing
+                return a
+            }) as any)
+        }
     };
 }
 

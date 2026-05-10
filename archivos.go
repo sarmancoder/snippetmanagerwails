@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	goruntime "runtime"
@@ -80,4 +82,19 @@ func (f *AdministradorArchivos) LeerArchivo(ruta string) (string, error) {
 	}
 
 	return string(data), nil
+}
+
+// Nueva función para escribir contenido en un archivo
+func (f *AdministradorArchivos) EscribirArchivo(ruta string, contenido string) error {
+	err := os.WriteFile(ruta, []byte(contenido), 0644)
+	if err != nil {
+		log.Printf("ERROR: %v", err)
+		return fmt.Errorf("error al escribir en el archivo: %w", err)
+	}
+
+	// Añade un log aquí
+	runtime.LogInfo(f.ctx, "Archivo escrito exitosamente.")
+	runtime.LogInfo(f.ctx, ruta)
+
+	return nil
 }

@@ -5,6 +5,8 @@ import {context} from '../models';
 
 export function AbrirCarpetaEnExplorador(arg1:string):Promise<void>;
 
+export function EscribirArchivo(arg1:string,arg2:string):Promise<void>;
+
 export function LeerArchivo(arg1:string):Promise<string>;
 
 export function SeleccionarYLeerCarpeta():Promise<main.ResultadoCarpeta>;

@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { useAppContext } from '../AppSnippetsContext';
 
 export default function MyAppBar() {
-    const {saved} = useAppContext()
+    const {saved, setsaved, saveSnippet} = useAppContext()
     return (
         <AppBar position="fixed">
             <Toolbar>
@@ -15,8 +15,9 @@ export default function MyAppBar() {
                     AiSnippets
                 </Typography>
                 <Box sx={{display: 'flex', gap: 2}}>
-                    <IconButton sx={{color: saved ? 'white' : colors.red[700]}} onClick={() => {
-                        console.log('Salvar archivo')
+                    <IconButton sx={{color: saved ? 'white' : colors.red[700]}} onClick={async () => {
+                        await saveSnippet()
+                        await setsaved(true)
                     }}>
                         <Save />
                     </IconButton>
