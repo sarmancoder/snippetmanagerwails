@@ -5,7 +5,7 @@ import createSnippet from '../utils/CreateSnippet'
 import { Delete } from '@mui/icons-material'
 
 export default function DrawerSnippets() {
-    const { snippetsList, currentPathFile, lookForSave, insertSnippet, currentSnippetKey, setCurrentSnippetKey } = useAppContext()
+    const { snippetsList, currentPathFile, lookForSave, insertSnippet, deleteSnippet, currentSnippetKey, setCurrentSnippetKey } = useAppContext()
     return (
         <Box sx={{
             bgcolor: colors.grey[300],
@@ -38,7 +38,11 @@ export default function DrawerSnippets() {
                             </span>
                         } />
                         <IconButton className='list-item__action'>
-                            <Delete sx={{color: 'red'}} />
+                            <Delete sx={{color: 'red'}} onClick={(e) => {
+                                e.stopPropagation()
+                                e.preventDefault()
+                                deleteSnippet(snippet.key)
+                            }} />
                         </IconButton>
                     </ListItemButton>
                 ))}

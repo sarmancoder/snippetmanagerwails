@@ -90,17 +90,22 @@ function useFetchData() {
         snippetEditing, setSnippetEditing,
         saveSnippet, lookForSave,
 
-        async insertSnippet(snippet: SnippetCreationObject) {
+        insertSnippet(snippet: SnippetCreationObject) {
             const newSnippet = {
                 ...snippet,
                 key: snippet.prefix + new Date().getTime(),
                 body: [],
                 scope: ''
             }
-            console.log('new snippet', newSnippet)
             const newSnippetList: typeof snippetsList = [...snippetsList, newSnippet]
             setSnippetsList(newSnippetList)
             setCurrentSnippetKey(newSnippet.key)
+        },
+
+        deleteSnippet(key: string) {
+            console.log({key, currentSnippetKey})
+            setSnippetsList([...snippetsList.filter(a => a.key != key)])
+            if (key == currentSnippetKey) setCurrentSnippetKey('')
         }
     };
 }
