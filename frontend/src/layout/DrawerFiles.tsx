@@ -1,19 +1,18 @@
-import { Box, colors, Toolbar, IconButton, TextField, Typography, Button } from '@mui/material'
-import { drawerWidth, filesExtension } from '../config'
 import { Folder } from '@mui/icons-material'
-import { AbrirCarpetaEnExplorador, LeerArchivo, SeleccionarYLeerCarpeta } from '../../wailsjs/go/main/AdministradorArchivos'
+import { Box, Button, colors, IconButton, Toolbar, Typography } from '@mui/material'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemText from '@mui/material/ListItemText'
 import { useState } from 'react'
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import { AbrirCarpetaEnExplorador, SeleccionarYLeerCarpeta } from '../../wailsjs/go/main/AdministradorArchivos'
 import { useAppContext } from '../AppSnippetsContext'
+import { drawerWidth, filesExtension } from '../config'
 
 export default function DrawerFiles() {
+    const {setCurrentPathFile, currentPathFile} = useAppContext()
+
     const [files, setfiles] = useState<string[]>([])
     const [pathFolder, setPathFolder] = useState('')
-
-    const {setCurrentPathFile, currentPathFile} = useAppContext()
     
     return (
         <Box sx={{
@@ -61,7 +60,7 @@ export default function DrawerFiles() {
                 )}
             </List>
             <Box sx={{ flexGrow: 1 }}></Box>
-            <Button variant="contained" size='small' disabled={currentPathFile.length == 0} sx={{ margin: 1 }} color="primary">
+            <Button variant="contained" disableElevation size='small' disabled={pathFolder.length == 0} sx={{ margin: 1 }} color="primary">
                 Añadir archivo
             </Button>
         </Box>

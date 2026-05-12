@@ -9,7 +9,7 @@ import { useAppContext } from '../AppSnippetsContext';
 export default function MyAppBar() {
     const {saved, setsaved, saveSnippet} = useAppContext()
     return (
-        <AppBar position="fixed">
+        <AppBar elevation={0} position="fixed">
             <Toolbar>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                     AiSnippets
