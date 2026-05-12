@@ -1,7 +1,6 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { EscribirArchivo, LeerArchivo } from '../wailsjs/go/main/AdministradorArchivos';
-import { isEmptySnippet } from './utils';
 import confirmAction from './utils/ConfirmAction';
 import { SnippetCreationObject } from './utils/CreateSnippet';
 
@@ -40,11 +39,20 @@ function useFetchData() {
     }, [currentPathFile])
 
     async function saveSnippet() {
-        await saveList();
-        setSnippetsList(snippetsList.map(a => {
-            if (a.key == currentSnippetKey) return snippetEditing
+        // await saveList();
+        console.log('guardando snippet')
+        const newList = snippetsList.map(a => {
+            if (a.key == currentSnippetKey) {
+                console.log({snippetEditing})
+                return {
+                    ...snippetEditing,
+                    key: a.key
+                }
+            }
             return a
-        }) as any)
+        })
+        console.log({newList})
+        setSnippetsList(newList as any)
     }
 
     async function saveList() {
@@ -58,6 +66,7 @@ function useFetchData() {
     }
 
     async function lookForSave() {
+        console.log({saved})
         if (saved) return true
         const change = await confirmAction({
             message: "¿Quieres salvar los cambios?",
@@ -68,6 +77,8 @@ function useFetchData() {
         return true
     }
 
+    useEffect(() => void saveList(), [snippetsList])
+
     return {
         currentPathFile, setCurrentPathFile,
         currentPathContent, setCurrentPathContent,
@@ -77,16 +88,16 @@ function useFetchData() {
         saveSnippet, lookForSave,
 
         async insertSnippet(snippet: SnippetCreationObject) {
-            const keySnippet = snippet.prefix + new Date().getTime()
-            const newSnippetList: typeof snippetsList = [...snippetsList, {
+            const newSnippet = {
                 ...snippet,
-                key: keySnippet,
+                key: snippet.prefix + new Date().getTime(),
                 body: [],
                 scope: ''
-            }]
+            }
+            console.log('new snippet', newSnippet)
+            const newSnippetList: typeof snippetsList = [...snippetsList, newSnippet]
             setSnippetsList(newSnippetList)
-            // setCurrentSnippetKey(keySnippet)
-            await saveList()
+            setCurrentSnippetKey(newSnippet.key)
         }
     };
 }

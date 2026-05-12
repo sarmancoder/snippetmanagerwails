@@ -41,7 +41,7 @@ export default function DrawerSnippets() {
             </List>
             <Box sx={{ flexGrow: 1 }}></Box>
             <Button variant="contained" size='small' disableElevation disabled={currentPathFile.length == 0} sx={{ margin: 1 }} color="primary" onClick={async () => {
-                if (!(await lookForSave)) return
+                if (!(await lookForSave())) return
                 const snippet = await createSnippet({})
                 if (snippet == null) return;
                 await insertSnippet(snippet)
