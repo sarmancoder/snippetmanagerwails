@@ -4,6 +4,7 @@ import App from './App'
 import AppContextProvider from './AppSnippetsContext'
 import LayoutApp from './layout'
 import './style.css'
+import MyMuiThemeProvider from './components/MyMuiThemeProvider'
 
 const container = document.getElementById('root')
 
@@ -12,9 +13,11 @@ const root = createRoot(container!)
 root.render(
     <React.StrictMode>
         <AppContextProvider>
-            <LayoutApp>
-                <App />
-            </LayoutApp>
+            <MyMuiThemeProvider>
+                <LayoutApp>
+                    <App />
+                </LayoutApp>
+            </MyMuiThemeProvider>
         </AppContextProvider>
     </React.StrictMode>
 )

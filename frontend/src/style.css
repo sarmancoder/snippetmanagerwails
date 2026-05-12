@@ -10,3 +10,8 @@ body {
 .list-item:hover .list-item__action {
     opacity: 1;
 }
+
+.Mui-selected {
+    background-color: color-mix(in srgb, var(--mui-palette-primary-main), white 35%) !important;
+    color: white !important;
+}
