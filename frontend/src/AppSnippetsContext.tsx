@@ -78,6 +78,9 @@ function useFetchData() {
     }
 
     useEffect(() => void saveList(), [snippetsList])
+    useEffect(() => {
+        setCurrentSnippetKey('')
+    }, [currentPathFile])
 
     return {
         currentPathFile, setCurrentPathFile,
