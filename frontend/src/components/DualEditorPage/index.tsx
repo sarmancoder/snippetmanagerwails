@@ -1,8 +1,8 @@
 import { Editor, OnMount } from '@monaco-editor/react'
 import { Box, Card, CardContent, CardHeader, TextField } from '@mui/material'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Select from "react-select";
-import { languageScopes } from '../../config';
+import { languageScopes, LanguageScopeValue } from '../../config';
 import { SnippetType, useAppContext } from '../../AppSnippetsContext';
 import { areSnippetsEqual, isEmptySnippet } from '../../utils';
 
@@ -55,8 +55,17 @@ export default function DualEditorPage() {
 
     // const [jsonSnippet, setJsonSnippet] = useState({})
 
-    const handleLeftEditorDidMount: OnMount = (editor, monaco) => {
+    const handleLeftEditorDidMount: OnMount = (editor, monaco: any) => {
         bodyEditor.current = editor
+        monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+            noSemanticValidation: true,
+            noSyntaxValidation: true,
+        });
+        monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+            noSemanticValidation: true,
+            noSyntaxValidation: true,
+        });
+
     }
     // Función que se ejecuta cuando el editor de la derecha se carga
     const handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -72,6 +81,19 @@ export default function DualEditorPage() {
             bodyEditor.current.setValue((infoJSON.body ?? []).join('\n'))
         });
     }
+
+    const currentScope = useMemo<LanguageScopeValue>(() => {
+        const scope = scopes.split(',')[0] as LanguageScopeValue
+        if (scope === 'javascriptreact') {
+            return 'javascript'
+        } else if (scope === 'typescriptreact') {
+            return 'typescript'
+        } else if (scope.length == 0) {
+            return 'plaintext' as any
+        } else {
+            return scope
+        }
+    }, [scopes])
 
     return (
         <Box sx={{
@@ -114,7 +136,7 @@ export default function DualEditorPage() {
                     />
                     <CardContent>
                         <Editor
-                            language={scopes.length == 0 ? 'plaintext' : scopes.split(',')[0]}
+                            language={currentScope}
                             theme='vs-dark'
                             height={'350px'}
                             onChange={(value) => setBody(value || '')}

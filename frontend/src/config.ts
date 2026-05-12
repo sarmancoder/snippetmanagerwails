@@ -33,4 +33,6 @@ export const languageScopes = [
     { value: 'xml', label: 'XML' },
     { value: 'lua', label: 'Lua' },
     { value: 'cpp', label: 'C++' }
-];
+] as const;
+
+export type LanguageScopeValue = (typeof languageScopes)[number]['value'] | '';

@@ -23,7 +23,7 @@ function App() {
                 alignItems: 'center',
                 height: '100%'
             }}>
-                <Typography variant="h3" color="initial">
+                <Typography variant="h3" sx={{textAlign: 'center'}} color="initial">
                     Seleccione un snippet para empezar
                 </Typography>
             </Box>
