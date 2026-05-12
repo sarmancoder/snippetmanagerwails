@@ -12,3 +12,5 @@ export function LeerArchivo(arg1:string):Promise<string>;
 export function SeleccionarYLeerCarpeta():Promise<main.ResultadoCarpeta>;
 
 export function SetContext(arg1:context.Context):Promise<void>;
+
+export function UnirRutas(arg1:Array<string>):Promise<string>;

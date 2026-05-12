@@ -4,10 +4,12 @@ import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
 import { useState } from 'react'
-import { AbrirCarpetaEnExplorador, SeleccionarYLeerCarpeta } from '../../wailsjs/go/main/AdministradorArchivos'
+import { AbrirCarpetaEnExplorador, EscribirArchivo, SeleccionarYLeerCarpeta, UnirRutas } from '../../wailsjs/go/main/AdministradorArchivos'
 import { useAppContext } from '../AppSnippetsContext'
 import { drawerWidth, filesExtension } from '../config'
 import { Paper, MenuList, MenuItem} from '@mui/material';
+import promptUser from '../utils/PromptUser'
+import alertMessage from '../utils/AlertMessage'
 
 export default function DrawerFiles() {
     const { setCurrentPathFile, currentPathFile } = useAppContext()
@@ -86,7 +88,26 @@ export default function DrawerFiles() {
                 })}
             </MenuList>
             <Box sx={{ flexGrow: 1 }}></Box>
-            <Button variant="contained" disableElevation size='small' disabled={pathFolder.length == 0} sx={{ margin: 1 }} color="primary">
+            <Button
+                variant="contained" disableElevation size='small'
+                disabled={pathFolder.length == 0} sx={{ margin: 1 }} color="primary"
+                onClick={async () => {
+                    const response = await promptUser({
+                        message: 'Que nombre le quieres poner al archivo'
+                    })
+                    const fileName = response?.endsWith('.' + filesExtension) ? response : response + `.${filesExtension}`
+                    if (fileName == null) return
+                    if (files.find(a => a === fileName)) {
+                        await alertMessage({message: 'El fichero existe'})
+                        return
+                    }
+                    const fullPath = await UnirRutas([pathFolder, fileName])
+                    console.log(fullPath)
+                    await EscribirArchivo(fullPath, '{}')
+                    setfiles([...files, fileName])
+                }}
+
+            >
                 Añadir archivo
             </Button>
         </Box>

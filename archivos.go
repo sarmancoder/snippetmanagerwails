@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	goruntime "runtime"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime" // Este es el de Wails
@@ -23,6 +24,11 @@ type AdministradorArchivos struct {
 
 func (f *AdministradorArchivos) SetContext(ctx context.Context) {
 	f.ctx = ctx
+}
+
+// UnirRutas recibe un array de strings desde el frontend y los une
+func (f *AdministradorArchivos) UnirRutas(partes []string) string {
+	return filepath.Join(partes...)
 }
 
 func (f *AdministradorArchivos) SeleccionarYLeerCarpeta() (*ResultadoCarpeta, error) {
@@ -84,17 +90,16 @@ func (f *AdministradorArchivos) LeerArchivo(ruta string) (string, error) {
 	return string(data), nil
 }
 
-// Nueva función para escribir contenido en un archivo
 func (f *AdministradorArchivos) EscribirArchivo(ruta string, contenido string) error {
+	// os.WriteFile crea el archivo si no existe.
+	// Si ya existe, lo trunca (borra el contenido previo) y escribe el nuevo.
 	err := os.WriteFile(ruta, []byte(contenido), 0644)
+
 	if err != nil {
 		log.Printf("ERROR: %v", err)
 		return fmt.Errorf("error al escribir en el archivo: %w", err)
 	}
 
-	// Añade un log aquí
-	runtime.LogInfo(f.ctx, "Archivo escrito exitosamente.")
-	runtime.LogInfo(f.ctx, ruta)
-
+	runtime.LogInfo(f.ctx, "Archivo procesado exitosamente: "+ruta)
 	return nil
 }

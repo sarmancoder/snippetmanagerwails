@@ -21,3 +21,7 @@ export function SeleccionarYLeerCarpeta() {
 export function SetContext(arg1) {
   return window['go']['main']['AdministradorArchivos']['SetContext'](arg1);
 }
+
+export function UnirRutas(arg1) {
+  return window['go']['main']['AdministradorArchivos']['UnirRutas'](arg1);
+}
