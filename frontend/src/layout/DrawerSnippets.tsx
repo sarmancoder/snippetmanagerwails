@@ -20,7 +20,10 @@ export default function DrawerSnippets() {
             <Toolbar />
             <List>
                 {snippetsList.map((snippet, index) => (
-                    <ListItemButton className='list-item' selected={currentSnippetKey == snippet.key} title={snippet.description} key={index} onClick={async () => {
+                    <ListItemButton draggable={true} onDragStart={(e) => {
+                        const data = JSON.stringify(snippet, null, 4)
+                        e.dataTransfer.setData('text', data)
+                    }} className='list-item' selected={currentSnippetKey == snippet.key} title={snippet.description} key={index} onClick={async () => {
                         if (!(await lookForSave())) return
                         setCurrentSnippetKey(snippet.key)
                     }}>

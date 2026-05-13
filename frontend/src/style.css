@@ -15,3 +15,7 @@ body {
     background-color: color-mix(in srgb, var(--mui-palette-primary-main), white 35%) !important;
     color: white !important;
 }
+
+.droppable-newfile.active {
+    background-color: rgba(138, 138, 138, 0.75);
+}
