@@ -93,6 +93,9 @@ export default function DrawerFiles() {
             flexDirection: 'column'
         }}>
             <Toolbar />
+            <div className="bg-purple-500 text-white p-4">
+  Tailwind funciona
+</div>
             <Box sx={{ display: 'flex', pt: 2 }}>
                 <IconButton aria-label="abrir" onClick={() => abrirCarpeta('')}>
                     <Folder />
@@ -126,9 +129,9 @@ export default function DrawerFiles() {
                         handleDropSnippet={async (data) => {
                             const dataJSON = JSON.parse(data)
                             const snippet = dataJSON[Object.keys(dataJSON)[0]]
-                            
+
                             await AgregarSnippet(await UnirRutas([pathFolder, item]), JSON.stringify(snippet))
-                            
+
                             const snippetKey = snippet.key
                             console.log('limpiando...', JSON.parse(data))
                             if (currentSnippetKey == snippetKey)
@@ -217,7 +220,7 @@ function FileMenuItem({ item, isSelected, onClick, onDelete, handleDropSnippet }
                 }}
                 sx={{ ml: 1 }}
             >
-                <Delete sx={{color: 'red'}} />
+                <Delete sx={{ color: 'red' }} />
             </IconButton>
         </MenuItem>
     );
