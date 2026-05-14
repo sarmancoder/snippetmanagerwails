@@ -32,22 +32,24 @@ func (f *AdministradorArchivos) UnirRutas(partes []string) string {
 	return filepath.Join(partes...)
 }
 
-func (f *AdministradorArchivos) SeleccionarYLeerCarpeta() (*ResultadoCarpeta, error) {
-	// 1. Abrir selector de carpeta
-	ruta, err := runtime.OpenDirectoryDialog(f.ctx, runtime.OpenDialogOptions{
-		Title: "Seleccionar carpeta de Snippets",
-	})
+func (f *AdministradorArchivos) SeleccionarYLeerCarpeta(dir string) (*ResultadoCarpeta, error) {
+	if dir == "" {
+		// 1. Abrir selector de carpeta
+		ruta, err := runtime.OpenDirectoryDialog(f.ctx, runtime.OpenDialogOptions{
+			Title: "Seleccionar carpeta de Snippets",
+		})
+		if err != nil {
+			return nil, err
+		}
 
-	if err != nil {
-		return nil, err
-	}
-
-	if ruta == "" {
-		return nil, nil // El usuario canceló
+		if ruta == "" {
+			return nil, nil // El usuario canceló
+		}
+		dir = ruta
 	}
 
 	// 2. Leer los archivos
-	entradas, err := os.ReadDir(ruta)
+	entradas, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -57,9 +59,11 @@ func (f *AdministradorArchivos) SeleccionarYLeerCarpeta() (*ResultadoCarpeta, er
 		nombres = append(nombres, entrada.Name())
 	}
 
+	f.saveLastDirectory(dir)
+
 	// 3. Devolvemos el objeto con ambos datos
 	return &ResultadoCarpeta{
-		Ruta:     ruta,
+		Ruta:     dir,
 		Archivos: nombres,
 	}, nil
 }
@@ -175,4 +179,66 @@ func (f *AdministradorArchivos) AgregarSnippet(ruta string, nuevoSnippetJSON str
 	}
 
 	return nil
+}
+
+func GetVSCodePath() string {
+	switch goruntime.GOOS {
+	case "windows":
+		// En Windows, Dart usa APPDATA
+		roamingPath := os.Getenv("APPDATA")
+		return filepath.Join(roamingPath, "Code", "User", "snippets")
+
+	case "darwin": // "darwin" es el nombre interno para macOS en Go
+		home := os.Getenv("HOME")
+		return filepath.Join(home, "Library", "Application Support", "Code", "User", "snippets")
+
+	default: // Linux y otros sistemas Unix-like
+		home := os.Getenv("HOME")
+		return filepath.Join(home, ".config", "Code", "User", "snippets")
+	}
+}
+
+type AppConfig struct {
+	LastDirectory string `json:"last_directory"`
+}
+
+func (a *AdministradorArchivos) getConfigPath() string {
+	// Es buena práctica manejar el error o asegurar un fallback
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		// Si falla, usamos el directorio temporal o el actual como fallback
+		dir = os.TempDir()
+	}
+	runtime.LogInfo(a.ctx, "Carpeta de configuración: "+dir)
+	return filepath.Join(dir, "aisnippets", "config.json")
+}
+
+func (a *AdministradorArchivos) LoadLastDirectory() string {
+	// FIX: Agregamos "a." para llamar al método del struct
+	configPath := a.getConfigPath()
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		// Asegúrate de que GetVSCodePath() sea una función global
+		// o llámala con a.GetVSCodePath() si es otro método
+		return GetVSCodePath()
+	}
+
+	var config AppConfig
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		return GetVSCodePath()
+	}
+
+	return config.LastDirectory
+}
+
+func (a *AdministradorArchivos) saveLastDirectory(path string) {
+	config := AppConfig{LastDirectory: path}
+	data, _ := json.Marshal(config)
+
+	configPath := a.getConfigPath()
+	// Crear el directorio si no existe
+	os.MkdirAll(filepath.Dir(configPath), 0755)
+	os.WriteFile(configPath, data, 0644)
 }

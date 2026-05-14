@@ -13,7 +13,9 @@ export function EscribirArchivo(arg1:string,arg2:string):Promise<void>;
 
 export function LeerArchivo(arg1:string):Promise<string>;
 
-export function SeleccionarYLeerCarpeta():Promise<main.ResultadoCarpeta>;
+export function LoadLastDirectory():Promise<string>;
+
+export function SeleccionarYLeerCarpeta(arg1:string):Promise<main.ResultadoCarpeta>;
 
 export function SetContext(arg1:context.Context):Promise<void>;
 

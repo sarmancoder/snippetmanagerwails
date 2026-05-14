@@ -3,8 +3,8 @@ import { Box, Button, colors, IconButton, Toolbar, Typography } from '@mui/mater
 import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
-import React, { DragEventHandler, useRef, useState } from 'react'
-import { AbrirCarpetaEnExplorador, AgregarSnippet, EliminarArchivo, EscribirArchivo, SeleccionarYLeerCarpeta, UnirRutas } from '../../wailsjs/go/main/AdministradorArchivos'
+import React, { DragEventHandler, useEffect, useRef, useState } from 'react'
+import { AbrirCarpetaEnExplorador, AgregarSnippet, EliminarArchivo, EscribirArchivo, LoadLastDirectory, SeleccionarYLeerCarpeta, UnirRutas } from '../../wailsjs/go/main/AdministradorArchivos'
 import { useAppContext } from '../AppSnippetsContext'
 import { drawerWidth, filesExtension } from '../config'
 import { Paper, MenuList, MenuItem } from '@mui/material';
@@ -20,6 +20,28 @@ export default function DrawerFiles() {
     const [pathFolder, setPathFolder] = useState('')
 
     const [draggingNew, setDraggingNew] = useState(false)
+
+    const abrirCarpeta = async (dir: string) => {
+        try {
+            // Pasamos 'dir' a Go. Si es "", Go debe decidir si abrir Dialog o usar LastPath
+            console.log(dir)
+            const r = await SeleccionarYLeerCarpeta(dir ?? '')
+            if (r) {
+                setfiles(r.archivos || [])
+                setPathFolder(r.ruta || '')
+            }
+        } catch (error) {
+            console.error("Error al abrir carpeta:", error)
+        }
+    }
+
+    useEffect(() => {
+        // Al arrancar, pedimos la última ruta guardada
+        LoadLastDirectory().then((dir) => {
+            // Llamamos a abrirCarpeta con el resultado (asegurando un string)
+            abrirCarpeta(dir || '')
+        })
+    }, [])
 
 
     const createNewFile = async (content = '{}') => {
@@ -72,11 +94,7 @@ export default function DrawerFiles() {
         }}>
             <Toolbar />
             <Box sx={{ display: 'flex', pt: 2 }}>
-                <IconButton aria-label="" onClick={async () => {
-                    const r = await SeleccionarYLeerCarpeta()
-                    setfiles(r.archivos)
-                    setPathFolder(r.ruta)
-                }}>
+                <IconButton aria-label="abrir" onClick={() => abrirCarpeta('')}>
                     <Folder />
                 </IconButton>
                 <Typography title={pathFolder} variant="subtitle2" color="initial"

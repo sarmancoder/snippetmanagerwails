@@ -22,8 +22,12 @@ export function LeerArchivo(arg1) {
   return window['go']['main']['AdministradorArchivos']['LeerArchivo'](arg1);
 }
 
-export function SeleccionarYLeerCarpeta() {
-  return window['go']['main']['AdministradorArchivos']['SeleccionarYLeerCarpeta']();
+export function LoadLastDirectory() {
+  return window['go']['main']['AdministradorArchivos']['LoadLastDirectory']();
+}
+
+export function SeleccionarYLeerCarpeta(arg1) {
+  return window['go']['main']['AdministradorArchivos']['SeleccionarYLeerCarpeta'](arg1);
 }
 
 export function SetContext(arg1) {
