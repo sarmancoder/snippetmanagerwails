@@ -1,13 +1,11 @@
 import { Editor, OnMount } from '@monaco-editor/react';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, TextField } from '@mui/material';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Box, Card, CardContent, CardHeader, TextField } from '@mui/material';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Select from "react-select";
-import { SnippetType, useAppContext } from '../../AppSnippetsContext';
+import { useAppContext } from '../../AppSnippetsContext';
 import { languageScopes, LanguageScopeValue } from '../../config';
-import { areSnippetsEqual, isEmptySnippet } from '../../utils';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Menu, MenuItem } from '@mui/material';
 import { SnippetsReplacements } from './SnippetsReplacements';
+import CardActions from '@mui/material/CardActions';
 
 export default function DualEditorPage() {
     const { snippetsList, currentSnippetKey, setSnippetEditing, activeSnippet, setsaved } = useAppContext()
@@ -17,35 +15,39 @@ export default function DualEditorPage() {
 
     const [prefix, setPrefix] = useState('')
     const [description, setDescription] = useState('')
-    const [scopes, setScopes] = useState('')
+    const [scope, setScope] = useState('')
     const [body, setBody] = useState('')
+    useEffect(() => {
+        console.log(scope)
+    }, [scope])
 
     useEffect(() => {
         const newSnippet = {
-            prefix, description, scopes,
+            key: currentSnippetKey, prefix, description, scope,
             body: body.split('\n')
         }
 
-        const currentSnippet = { body: body.split('\n'), scope: scopes, description, prefix }
-        const areEqual = activeSnippet && !areSnippetsEqual(currentSnippet, activeSnippet as SnippetType)
-        if (!isEmptySnippet(currentSnippet) && areEqual) {
-            setsaved(false)
-            setSnippetEditing({ prefix, description, scope: scopes, body: body.split('\n') })
-        }
-
-        // Actualizar el valor del editor directamente si la instancia existe
         if (jsonResultRef.current) {
             const jsonString = JSON.stringify(newSnippet, null, 2)
             jsonResultRef.current.setValue(jsonString)
         }
-    }, [prefix, description, scopes, body])
+
+        const snippetEditingFromList = snippetsList.find(a => a.key == currentSnippetKey)
+        if (!currentSnippetKey) return
+
+        const equal = JSON.stringify(snippetEditingFromList) == JSON.stringify(newSnippet)
+        if (equal) return
+
+        setsaved(false)
+        setSnippetEditing({ prefix, description, scope, body: body.split('\n') })
+    }, [prefix, description, scope, body])
 
     useEffect(() => {
         const snippet = snippetsList.find(a => a.key == currentSnippetKey)
         if (!snippet) return
         setPrefix(snippet.prefix)
         setDescription(snippet.description)
-        setScopes(snippet.scope.split(',').map(a => {
+        setScope(snippet.scope.split(',').map(a => {
             return languageScopes.find(x => x.value == a)?.value
         }).join(','))
         setBody(snippet.body.join('\n'))
@@ -80,23 +82,23 @@ export default function DualEditorPage() {
             setPrefix(infoJSON.prefix)
             setDescription(infoJSON.description)
             setBody(infoJSON.body.join('\n'))
-            setScopes((infoJSON.scopes ?? []).join(','))
+            setScope((infoJSON.scopes ?? []).join(','))
             bodyEditor.current.setValue((infoJSON.body ?? []).join('\n'))
         });
     }
 
     const currentScope = useMemo<LanguageScopeValue>(() => {
-        const scope = scopes.split(',')[0] as LanguageScopeValue
-        if (scope === 'javascriptreact') {
+        const _scope = scope.split(',')[0] as LanguageScopeValue
+        if (_scope === 'javascriptreact') {
             return 'javascript'
-        } else if (scope === 'typescriptreact') {
+        } else if (_scope === 'typescriptreact') {
             return 'typescript'
-        } else if (scope.length == 0) {
+        } else if (_scope.length == 0) {
             return 'plaintext' as any
         } else {
-            return scope
+            return _scope
         }
-    }, [scopes])
+    }, [scope])
 
     const handleReplaceSelection = (textToInsert) => {
         const editor = bodyEditor.current;
@@ -143,7 +145,7 @@ export default function DualEditorPage() {
                     onChange={(e) => setDescription(e.target.value)}
                 />
                 <Card variant="outlined">
-                    <CardHeader title={'Contenido del snippet'}
+                    <CardHeader title={'Contenido'}
                         action={(
                             <Box>
                                 <Select
@@ -154,8 +156,8 @@ export default function DualEditorPage() {
                                         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                                         container: (base) => ({ ...base, width: '340px' })
                                     }}
-                                    value={languageScopes.filter(a => scopes.split(',').includes(a.value))}
-                                    onChange={(c) => setScopes(c.map((a: any) => a.value).join(','))}
+                                    value={languageScopes.filter(a => scope.split(',').includes(a.value))}
+                                    onChange={(c) => setScope(c.map((a: any) => a.value).join(','))}
                                 />
                             </Box>
                         )}
@@ -169,7 +171,7 @@ export default function DualEditorPage() {
                             onMount={handleLeftEditorDidMount}
                         />
                     </CardContent>
-                    <CardActions sx={{display: 'flex', justifyContent: 'end'}}>
+                    <CardActions sx={{ display: 'flex', justifyContent: 'end', p: 2, bgcolor: '#f5f5f5' }}>
                         <SnippetsReplacements onReplace={(value) => {
                             handleReplaceSelection(value)
                         }} />

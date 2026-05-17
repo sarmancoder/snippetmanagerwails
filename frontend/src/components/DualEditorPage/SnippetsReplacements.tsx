@@ -75,21 +75,27 @@ export function SnippetsReplacements({ onReplace }: Props) {
     return (
         <Box>
             <Button
-                variant="contained"
-                disableElevation
-                size="small"
-                onClick={handleClick}
-                endIcon={<KeyboardArrowDownIcon />}
-                sx={{ textTransform: 'none' }}
-            >
-                Reemplazar
-            </Button>
+            variant="contained"
+            color="primary" // Forzamos el color principal de tu tema
+            disableElevation
+            size="small"
+            onClick={handleClick}
+            endIcon={<KeyboardArrowDownIcon />}
+        >
+            Reemplazar
+        </Button>
             <Menu
                 anchorEl={anchorEl}
                 open={open}
-
                 onClose={handleClose}
-                sx={{height: '600px'}}
+                slotProps={{
+                    paper: {
+                        style: {
+                            maxHeight: 400, // Limita el alto de forma correcta con scroll interno
+                            width: '320px',
+                        },
+                    },
+                }}
             >
                 {SNIPPET_VARIABLES.map((group, idx) => [
                     idx > 0 && <Divider key={`div-${idx}`} />,
@@ -97,8 +103,8 @@ export function SnippetsReplacements({ onReplace }: Props) {
                         {group.label}
                     </ListSubheader>,
                     group.variables.map((v) => (
-                        <MenuItem 
-                            key={v.id} 
+                        <MenuItem
+                            key={v.id}
                             onClick={() => handleMenuClick(v.id)}
                             sx={{ justifyContent: 'space-between' }}
                         >

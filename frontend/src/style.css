@@ -23,3 +23,24 @@ body {
 .droppable-newfile.active {
     background-color: rgba(138, 138, 138, 0.75);
 }
+
+.MuiButton-contained {
+    /* Usamos la variable del color principal y su contraste de texto */
+    background-color: var(--mui-palette-primary-main) !important;
+    color: var(--mui-palette-primary-contrastText) !important;
+}
+
+.MuiButton-contained:hover {
+    /* Usamos la variable específica de MUI para el estado hover */
+    background-color: var(--mui-palette-primary-dark) !important;
+}
+
+.MuiButton-root {
+    text-transform: none !important;
+}
+
+/* Tu regla existente */
+.Mui-selected {
+    background-color: color-mix(in srgb, var(--mui-palette-primary-main), white 35%) !important;
+    color: white !important;
+}

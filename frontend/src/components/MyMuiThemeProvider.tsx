@@ -1,4 +1,4 @@
-import { createTheme, StyledEngineProvider, ThemeProvider } from "@mui/material";
+import { createTheme, CssBaseline, ScopedCssBaseline, StyledEngineProvider, ThemeProvider } from "@mui/material";
 
 const theme = createTheme({
   cssVariables: true,
@@ -7,7 +7,9 @@ const theme = createTheme({
 export default function MyMuiThemeProvider({children}) {
   return (
     <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+      <ScopedCssBaseline>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+      </ScopedCssBaseline>
     </StyledEngineProvider>
   )
 }
