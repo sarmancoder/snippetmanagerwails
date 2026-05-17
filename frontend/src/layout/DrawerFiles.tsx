@@ -1,17 +1,13 @@
 import { Delete, Folder } from '@mui/icons-material'
-import { Box, Button, colors, IconButton, Toolbar, Typography } from '@mui/material'
-import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemText from '@mui/material/ListItemText'
-import React, { DragEventHandler, useEffect, useRef, useState } from 'react'
+import { Box, Button, colors, IconButton, MenuItem, MenuList, Toolbar, Typography } from '@mui/material'
+import clsx from 'clsx'
+import { useEffect, useRef, useState } from 'react'
 import { AbrirCarpetaEnExplorador, AgregarSnippet, EliminarArchivo, EscribirArchivo, LoadLastDirectory, SeleccionarYLeerCarpeta, UnirRutas } from '../../wailsjs/go/main/AdministradorArchivos'
 import { useAppContext } from '../AppSnippetsContext'
 import { drawerWidth, filesExtension } from '../config'
-import { Paper, MenuList, MenuItem } from '@mui/material';
-import promptUser from '../utils/PromptUser'
 import alertMessage from '../utils/AlertMessage'
-import clsx from 'clsx'
 import confirmAction from '../utils/ConfirmAction'
+import promptUser from '../utils/PromptUser'
 
 export default function DrawerFiles() {
     const { setCurrentPathFile, currentPathFile, currentSnippetKey, setCurrentSnippetKey, deleteSnippet } = useAppContext()
@@ -205,23 +201,25 @@ function FileMenuItem({ item, isSelected, onClick, onDelete, handleDropSnippet }
                 handleDropSnippet(data);
             }}
         >
-            <ListItemText primary={fileName} />
+            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Typography variant="subtitle1" color="initial">{fileName}</Typography>
 
-            <IconButton
-                className='list-item__action'
-                size="small"
-                onClick={async (e) => {
-                    e.stopPropagation();
-                    const confirmed = await confirmAction({
-                        message: '¿Seguro que quieres borrar el archivo?'
-                    })
-                    if (!confirmed) return
-                    onDelete();
-                }}
-                sx={{ ml: 1 }}
-            >
-                <Delete sx={{ color: 'red' }} />
-            </IconButton>
+                <IconButton
+                    className='list-item__action'
+                    size="small"
+                    onClick={async (e) => {
+                        e.stopPropagation();
+                        const confirmed = await confirmAction({
+                            message: '¿Seguro que quieres borrar el archivo?'
+                        })
+                        if (!confirmed) return
+                        onDelete();
+                    }}
+                    sx={{ ml: 1 }}
+                >
+                    <Delete sx={{ color: 'red' }} />
+                </IconButton>
+            </Box>
         </MenuItem>
     );
 }

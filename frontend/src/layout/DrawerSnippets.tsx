@@ -1,4 +1,4 @@
-import { Box, Button, colors, IconButton, List, ListItemButton, ListItemText, Toolbar } from '@mui/material'
+import { Box, Button, colors, IconButton, List, ListItemButton, ListItemText, Toolbar, Typography } from '@mui/material'
 import { useAppContext } from '../AppSnippetsContext'
 import { drawerWidth } from '../config'
 import createSnippet from '../utils/CreateSnippet'
@@ -21,13 +21,24 @@ export default function DrawerSnippets() {
             <List>
                 {snippetsList.map((snippet, index) => (
                     <ListItemButton draggable={true} onDragStart={(e) => {
-                        const data = JSON.stringify({[snippet.key]: snippet}, null, 4)
+                        const data = JSON.stringify({ [snippet.key]: snippet }, null, 4)
                         e.dataTransfer.setData('text', data)
                     }} className='list-item' selected={currentSnippetKey == snippet.key} title={snippet.description} key={index} onClick={async () => {
                         if (!(await lookForSave())) return
                         setCurrentSnippetKey(snippet.key)
                     }}>
-                        <ListItemText primary={snippet.prefix} secondary={
+                        <ListItemText primary={(
+                            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                <Typography>{snippet.prefix}</Typography>
+                                <IconButton className='list-item__action'>
+                                    <Delete sx={{ color: 'red' }} onClick={(e) => {
+                                        e.stopPropagation()
+                                        e.preventDefault()
+                                        deleteSnippet(snippet.key)
+                                    }} />
+                                </IconButton>
+                            </Box>
+                        )} secondary={ (!snippet.description || snippet.description?.length == 0) ? <Box /> :
                             <span style={{
                                 display: '-webkit-box',
                                 WebkitBoxOrient: 'vertical',
@@ -40,13 +51,7 @@ export default function DrawerSnippets() {
                                 {snippet.description}
                             </span>
                         } />
-                        <IconButton className='list-item__action'>
-                            <Delete sx={{color: 'red'}} onClick={(e) => {
-                                e.stopPropagation()
-                                e.preventDefault()
-                                deleteSnippet(snippet.key)
-                            }} />
-                        </IconButton>
+
                     </ListItemButton>
                 ))}
             </List>
