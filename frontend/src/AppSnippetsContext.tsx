@@ -6,7 +6,7 @@ import { SnippetCreationObject } from './utils/CreateSnippet';
 
 const MyContext = createContext<any>(null);
 
-export type SnippetType = { body: string[], scope: string, description: string, prefix: string }
+export type SnippetType = { body: string[], scope: string, isFileTemplate: boolean, description: string, prefix: string }
 type SnippetArrayElem = SnippetType & { key: string }
 
 function useFetchData() {
@@ -19,7 +19,8 @@ function useFetchData() {
         body: [],
         scope: '',
         description: '',
-        prefix: ''
+        prefix: '',
+        isFileTemplate: false
     })
 
     const activeSnippet = useMemo(() => {
@@ -97,11 +98,12 @@ function useFetchData() {
         saveSnippet, lookForSave,
 
         insertSnippet(snippet: SnippetCreationObject) {
-            const newSnippet = {
+            const newSnippet: SnippetArrayElem = {
                 ...snippet,
                 key: snippet.prefix + new Date().getTime(),
                 body: [],
-                scope: ''
+                scope: '',
+                isFileTemplate: false
             }
             const newSnippetList: typeof snippetsList = [...snippetsList, newSnippet]
             setSnippetsList(newSnippetList)

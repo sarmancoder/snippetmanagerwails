@@ -1,11 +1,11 @@
 import { Editor, OnMount } from '@monaco-editor/react';
 import { Box, Card, CardContent, CardHeader, FormControlLabel, Switch, TextField } from '@mui/material';
+import CardActions from '@mui/material/CardActions';
 import { useEffect, useMemo, useReducer, useRef } from 'react';
 import Select from "react-select";
-import { useAppContext } from '../../AppSnippetsContext';
+import { SnippetType, useAppContext } from '../../AppSnippetsContext';
 import { languageScopes, LanguageScopeValue } from '../../config';
 import { SnippetsReplacements } from './SnippetsReplacements';
-import CardActions from '@mui/material/CardActions';
 
 type SnippetState = {
     prefix: string
@@ -16,7 +16,7 @@ type SnippetState = {
 }
 
 type SnippetAction =
-    | { type: 'SET_FIELD'; field: keyof SnippetState; value: SnippetState[keyof SnippetState] } // ← acepta cualquier tipo
+    | { type: 'SET_FIELD'; field: keyof SnippetState; value: SnippetState[keyof SnippetState] }
     | { type: 'RESET'; payload: SnippetState }
 
 function snippetReducer(state: SnippetState, action: SnippetAction): SnippetState {
@@ -39,51 +39,53 @@ const initialState: SnippetState = {
 }
 
 export default function DualEditorPage() {
-    const { snippetsList, currentSnippetKey, setSnippetEditing, setsaved } = useAppContext()
+    const { snippetsList, currentSnippetKey, activeSnippet, setSnippetEditing, setsaved } = useAppContext()
 
     const bodyEditor = useRef<any>(null)
     const jsonResultRef = useRef<any>(null)
+    // 💡 Bandera para evitar que salte el setSaved(false) al cargar el snippet
+    const isInitializing = useRef<boolean>(false) 
 
     const [state, dispatch] = useReducer(snippetReducer, initialState)
     const { prefix, description, scope, body, isFileTemplate } = state
 
     useEffect(() => {
-        const newSnippet = {
-            key: currentSnippetKey, prefix, description, scope,
-            body: body.split('\n')
+        const snippetEditing: SnippetType = {
+            isFileTemplate: state.isFileTemplate ?? false,
+            description: state.description,
+            body: state.body.split('\n'),
+            prefix: state.prefix,
+            scope: state.scope
         }
-
         if (jsonResultRef.current) {
-            const { key, ...jsondata } = newSnippet
-
-            let currentJSON: Record<string, any> = {}
-            try {
-                currentJSON = JSON.parse(jsonResultRef.current.getValue())
-            } catch {}
-
-            const merged = {
-                ...currentJSON,
-                ...jsondata,
-                ...(isFileTemplate ? { isFileTemplate: true } : { isFileTemplate: undefined }),
-            }
-
-            Object.keys(merged).forEach(k => merged[k] === undefined && delete merged[k])
-            jsonResultRef.current.setValue(JSON.stringify(merged, null, 2))
+            jsonResultRef.current.setValue(JSON.stringify(snippetEditing, null, 2))
         }
 
-        const snippetEditingFromList = snippetsList.find(a => a.key == currentSnippetKey)
-        if (!currentSnippetKey) return
+        if (!activeSnippet) return
+        
+        const snippetSaved: SnippetType = {
+            isFileTemplate: activeSnippet.isFileTemplate ?? false,
+            description: activeSnippet.description,
+            body: activeSnippet.body,
+            prefix: activeSnippet.prefix,
+            scope: activeSnippet.scope
+        }
 
-        const equal = JSON.stringify(snippetEditingFromList) == JSON.stringify(newSnippet)
-        if (equal) return
+        const equal = JSON.stringify(snippetEditing) == JSON.stringify(snippetSaved)
+        console.log({equal})
+        if (!equal) {
+            setsaved(false)
+        }
 
-        setsaved(false)
-        setSnippetEditing({ prefix, description, scope, body: body.split('\n') })
-    }, [prefix, description, scope, body, isFileTemplate])
+        setSnippetEditing(snippetEditing)
+    }, [state, activeSnippet])
 
     useEffect(() => {
         const snippet = snippetsList.find(a => a.key == currentSnippetKey)
         if (!snippet) return
+
+        // 💡 Activamos el flag de inicialización justo antes de resetear el estado local
+        isInitializing.current = true;
 
         const resolvedScope = snippet.scope.split(',').map(a => {
             return languageScopes.find(x => x.value == a)?.value
@@ -92,16 +94,16 @@ export default function DualEditorPage() {
         dispatch({
             type: 'RESET',
             payload: {
-                prefix: snippet.prefix,
-                description: snippet.description,
+                prefix: snippet.prefix ?? '',
+                description: snippet.description ?? '',
                 scope: resolvedScope,
-                body: snippet.body.join('\n'),
+                body: Array.isArray(snippet.body) ? snippet.body.join('\n') : '',
                 isFileTemplate: (snippet as any).isFileTemplate ?? false,
             }
         })
 
         if (bodyEditor.current) {
-            bodyEditor.current.setValue(snippet.body.join('\n'))
+            bodyEditor.current.setValue(Array.isArray(snippet.body) ? snippet.body.join('\n') : '')
         }
     }, [currentSnippetKey])
 
@@ -137,7 +139,7 @@ export default function DualEditorPage() {
                 })
 
                 bodyEditor.current?.setValue((infoJSON.body ?? []).join('\n'))
-            } catch {}
+            } catch { }
         })
     }
 
