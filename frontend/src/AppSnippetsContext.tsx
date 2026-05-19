@@ -3,13 +3,14 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { EscribirArchivo, LeerArchivo } from '../wailsjs/go/main/AdministradorArchivos';
 import confirmAction from './utils/ConfirmAction';
 import { SnippetCreationObject } from './utils/CreateSnippet';
+import alertMessage from './utils/AlertMessage';
 
 const MyContext = createContext<any>(null);
 
 export type SnippetType = { body: string[], scope: string, isFileTemplate: boolean, description: string, prefix: string }
 type SnippetArrayElem = SnippetType & { key: string }
 
-function useFetchData() {
+function useAppSnippetsContext() {
     const [currentPathFile, setCurrentPathFile] = useState('');
     const [currentPathContent, setCurrentPathContent] = useState('');
     const [snippetsList, setSnippetsList] = useState<SnippetArrayElem[]>([])
@@ -35,13 +36,19 @@ function useFetchData() {
 
     useEffect(() => {
         LeerArchivo(currentPathFile).then(r => {
-            setCurrentPathContent(r)
-            const data: Record<string, SnippetType> = JSON.parse(r)
-            const snippetsArray = Object.keys(data).reduce<SnippetArrayElem[]>((acc, key) => {
-                acc.push({ key, ...data[key] });
-                return acc;
-            }, []);
-            setSnippetsList(snippetsArray);
+            try {
+                const data: Record<string, SnippetType> = JSON.parse(r)
+                console.log({data})
+                const snippetsArray = Object.keys(data).reduce<SnippetArrayElem[]>((acc, key) => {
+                    acc.push({ key, ...data[key] });
+                    return acc;
+                }, []);
+                setCurrentPathContent(r)
+                setSnippetsList(snippetsArray);
+            } catch (error) {
+                alertMessage({message: 'Archivo JSON no válido'})
+                setCurrentPathFile('')
+            }
         })
     }, [currentPathFile])
 
@@ -63,6 +70,7 @@ function useFetchData() {
     }
 
     async function saveList() {
+        if (currentPathFile === '') return
         const snippetObj = snippetsList.reduce((acc, { key, ...curr }) => {
             acc[key] = key == currentSnippetKey ? snippetEditing : curr;
             return acc;
@@ -92,7 +100,7 @@ function useFetchData() {
     return {
         currentPathFile, setCurrentPathFile,
         currentPathContent, setCurrentPathContent,
-        snippetsList, saved, setsaved, activeSnippet,
+        setSnippetsList, snippetsList, saved, setsaved, activeSnippet,
         setCurrentSnippetKey, currentSnippetKey,
         snippetEditing, setSnippetEditing,
         saveSnippet, lookForSave,
@@ -119,7 +127,7 @@ function useFetchData() {
 }
 
 export default function AppContextProvider({ children }) {
-    const data = useFetchData();
+    const data = useAppSnippetsContext();
     return (
         <MyContext.Provider value={data}>
             {children}
@@ -128,7 +136,7 @@ export default function AppContextProvider({ children }) {
 };
 
 export function useAppContext() {
-    const data = useContext<ReturnType<typeof useFetchData>>(MyContext);
+    const data = useContext<ReturnType<typeof useAppSnippetsContext>>(MyContext);
     if (!data) throw new Error('useMyContext must be used within a MyProvider');
     return data;
 }

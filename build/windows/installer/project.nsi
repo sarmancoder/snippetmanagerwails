@@ -95,6 +95,22 @@ Section
     !insertmacro wails.associateCustomProtocols
 
     !insertmacro wails.writeUninstaller
+
+    ; === MENÚ CONTEXTUAL: CLIC DERECHO EN CARPETAS ===
+    ; Crea la opción en el menú al hacer clic sobre una carpeta
+    WriteRegStr HKCR "Directory\shell\AiSnippets" "" "Abrir carpeta con AiSnippets"
+    WriteRegStr HKCR "Directory\shell\AiSnippets" "Icon" "$INSTDIR\${PRODUCT_EXECUTABLE}"
+    WriteRegStr HKCR "Directory\shell\AiSnippets\command" "" '"$INSTDIR\${PRODUCT_EXECUTABLE}" "%1"'
+
+    ; Crea la opción en el menú al hacer clic en el fondo blanco de una carpeta
+    WriteRegStr HKCR "Directory\Background\shell\AiSnippets" "" "Abrir con AiSnippets aquí"
+    WriteRegStr HKCR "Directory\Background\shell\AiSnippets" "Icon" "$INSTDIR\${PRODUCT_EXECUTABLE}"
+    WriteRegStr HKCR "Directory\Background\shell\AiSnippets\command" "" '"$INSTDIR\${PRODUCT_EXECUTABLE}" "%V"'
+
+    ; === MENÚ CONTEXTUAL: CLIC DERECHO EN CUALQUIER ARCHIVO ===
+    WriteRegStr HKCR "*\shell\AiSnippets" "" "Abrir con AiSnippets"
+    WriteRegStr HKCR "*\shell\AiSnippets" "Icon" "$INSTDIR\${PRODUCT_EXECUTABLE}"
+    WriteRegStr HKCR "*\shell\AiSnippets\command" "" '"$INSTDIR\${PRODUCT_EXECUTABLE}" "%1"'
 SectionEnd
 
 Section "uninstall"
@@ -111,4 +127,9 @@ Section "uninstall"
     !insertmacro wails.unassociateCustomProtocols
 
     !insertmacro wails.deleteUninstaller
+    
+    ; Borrar las opciones del menú contextual del registro
+    DeleteRegKey HKCR "Directory\shell\AiSnippets"
+    DeleteRegKey HKCR "Directory\Background\shell\AiSnippets"
+    DeleteRegKey HKCR "*\shell\AiSnippets"
 SectionEnd

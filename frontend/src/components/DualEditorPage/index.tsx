@@ -93,7 +93,7 @@ export default function DualEditorPage() {
         // 💡 Activamos el flag de inicialización justo antes de resetear el estado local
         isInitializing.current = true;
 
-        const resolvedScope = snippet.scope.split(',').map(a => {
+        const resolvedScope = (snippet.scope ?? '').split(',').map(a => {
             return languageScopes.find(x => x.value == a)?.value
         }).join(',')
 

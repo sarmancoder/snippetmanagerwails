@@ -18,6 +18,10 @@ export function EscribirArchivo(arg1, arg2) {
   return window['go']['main']['AdministradorArchivos']['EscribirArchivo'](arg1, arg2);
 }
 
+export function GetVSCodePath() {
+  return window['go']['main']['AdministradorArchivos']['GetVSCodePath']();
+}
+
 export function LeerArchivo(arg1) {
   return window['go']['main']['AdministradorArchivos']['LeerArchivo'](arg1);
 }

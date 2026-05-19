@@ -8,6 +8,7 @@ import { drawerWidth, filesExtension } from '../config'
 import alertMessage from '../utils/AlertMessage'
 import confirmAction from '../utils/ConfirmAction'
 import promptUser from '../utils/PromptUser'
+import OpenFolderButton from '../components/OpenFolderButton'
 
 export default function DrawerFiles() {
     const { setCurrentPathFile, currentPathFile, currentSnippetKey, setCurrentSnippetKey, deleteSnippet } = useAppContext()
@@ -16,28 +17,6 @@ export default function DrawerFiles() {
     const [pathFolder, setPathFolder] = useState('')
 
     const [draggingNew, setDraggingNew] = useState(false)
-
-    const abrirCarpeta = async (dir: string) => {
-        try {
-            // Pasamos 'dir' a Go. Si es "", Go debe decidir si abrir Dialog o usar LastPath
-            console.log(dir)
-            const r = await SeleccionarYLeerCarpeta(dir ?? '')
-            if (r) {
-                setfiles(r.archivos || [])
-                setPathFolder(r.ruta || '')
-            }
-        } catch (error) {
-            console.error("Error al abrir carpeta:", error)
-        }
-    }
-
-    useEffect(() => {
-        // Al arrancar, pedimos la última ruta guardada
-        LoadLastDirectory().then((dir) => {
-            // Llamamos a abrirCarpeta con el resultado (asegurando un string)
-            abrirCarpeta(dir || '')
-        })
-    }, [])
 
 
     const createNewFile = async (content = '{}') => {
@@ -90,9 +69,10 @@ export default function DrawerFiles() {
         }}>
             <Toolbar />
             <Box sx={{ display: 'flex', pt: 2 }}>
-                <IconButton aria-label="abrir" onClick={() => abrirCarpeta('')}>
+                <OpenFolderButton setfiles={setfiles} setPathFolder={setPathFolder} />
+                {/* <IconButton aria-label="abrir" onClick={() => abrirCarpeta('')}>
                     <Folder />
-                </IconButton>
+                </IconButton> */}
                 <Typography title={pathFolder} variant="subtitle2" color="initial"
                     onClick={() => AbrirCarpetaEnExplorador(pathFolder)}
                     sx={{

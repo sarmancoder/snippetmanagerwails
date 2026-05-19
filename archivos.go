@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -34,18 +35,24 @@ func (f *AdministradorArchivos) UnirRutas(partes []string) string {
 
 func (f *AdministradorArchivos) SeleccionarYLeerCarpeta(dir string) (*ResultadoCarpeta, error) {
 	if dir == "" {
-		// 1. Abrir selector de carpeta
-		ruta, err := runtime.OpenDirectoryDialog(f.ctx, runtime.OpenDialogOptions{
-			Title: "Seleccionar carpeta de Snippets",
-		})
-		if err != nil {
-			return nil, err
-		}
+		flag.Parse()
+		argumentosSueltos := flag.Args()
+		if len(argumentosSueltos) > 0 {
+			dir = argumentosSueltos[0]
+		} else {
+			// 1. Abrir selector de carpeta
+			ruta, err := runtime.OpenDirectoryDialog(f.ctx, runtime.OpenDialogOptions{
+				Title: "Seleccionar carpeta de Snippets",
+			})
+			if err != nil {
+				return nil, err
+			}
 
-		if ruta == "" {
-			return nil, nil // El usuario canceló
+			if ruta == "" {
+				return nil, nil // El usuario canceló
+			}
+			dir = ruta
 		}
-		dir = ruta
 	}
 
 	// 2. Leer los archivos
@@ -181,7 +188,7 @@ func (f *AdministradorArchivos) AgregarSnippet(ruta string, nuevoSnippetJSON str
 	return nil
 }
 
-func GetVSCodePath() string {
+func (f *AdministradorArchivos) GetVSCodePath() string {
 	switch goruntime.GOOS {
 	case "windows":
 		// En Windows, Dart usa APPDATA
@@ -221,13 +228,13 @@ func (a *AdministradorArchivos) LoadLastDirectory() string {
 	if err != nil {
 		// Asegúrate de que GetVSCodePath() sea una función global
 		// o llámala con a.GetVSCodePath() si es otro método
-		return GetVSCodePath()
+		return a.GetVSCodePath()
 	}
 
 	var config AppConfig
 	err = json.Unmarshal(data, &config)
 	if err != nil {
-		return GetVSCodePath()
+		return a.GetVSCodePath()
 	}
 
 	return config.LastDirectory

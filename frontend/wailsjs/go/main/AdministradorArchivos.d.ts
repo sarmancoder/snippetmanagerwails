@@ -11,6 +11,8 @@ export function EliminarArchivo(arg1:string):Promise<void>;
 
 export function EscribirArchivo(arg1:string,arg2:string):Promise<void>;
 
+export function GetVSCodePath():Promise<string>;
+
 export function LeerArchivo(arg1:string):Promise<string>;
 
 export function LoadLastDirectory():Promise<string>;
