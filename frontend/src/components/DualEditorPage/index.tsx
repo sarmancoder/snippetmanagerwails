@@ -39,6 +39,7 @@ const initialState: SnippetState = {
 }
 
 export default function DualEditorPage() {
+    const loadingSnippetRef = useRef(false)
     const { snippetsList, currentSnippetKey, activeSnippet, setSnippetEditing, setsaved } = useAppContext()
 
     const bodyEditor = useRef<any>(null)
@@ -71,16 +72,21 @@ export default function DualEditorPage() {
             scope: activeSnippet.scope
         }
 
-        const equal = JSON.stringify(snippetEditing) == JSON.stringify(snippetSaved)
-        console.log({equal})
-        if (!equal) {
-            setsaved(false)
+        if (!loadingSnippetRef.current) {
+            const equal = JSON.stringify(snippetEditing) == JSON.stringify(snippetSaved)
+            console.log({equal, loading: loadingSnippetRef.current})
+            if (!equal) {
+                setsaved(false)
+            } else {
+                setsaved(true)
+            }
         }
 
         setSnippetEditing(snippetEditing)
-    }, [state, activeSnippet])
+    }, [state])
 
     useEffect(() => {
+        loadingSnippetRef.current = true
         const snippet = snippetsList.find(a => a.key == currentSnippetKey)
         if (!snippet) return
 
@@ -105,6 +111,7 @@ export default function DualEditorPage() {
         if (bodyEditor.current) {
             bodyEditor.current.setValue(Array.isArray(snippet.body) ? snippet.body.join('\n') : '')
         }
+        loadingSnippetRef.current = false
     }, [currentSnippetKey])
 
     const handleLeftEditorDidMount: OnMount = (editor, monaco: any) => {
@@ -201,7 +208,7 @@ export default function DualEditorPage() {
                                     menuPortalTarget={document.body}
                                     styles={{
                                         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                                        container: (base) => ({ ...base, width: '340px' })
+                                        container: (base) => ({ ...base, width: '400px' })
                                     }}
                                     value={languageScopes.filter(a => scope.split(',').includes(a.value))}
                                     onChange={(c) => dispatch({
