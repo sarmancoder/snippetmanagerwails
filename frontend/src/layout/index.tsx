@@ -3,8 +3,6 @@ import MyAppBar from './AppBar';
 import DrawerFiles from './DrawerFiles';
 import DrawerSnippets from './DrawerSnippets';
 import MainContent from './MainContent';
-import IAButton from '../components/IAButton';
-
 
 export default function LayoutApp({children}) {
     return (
@@ -14,7 +12,6 @@ export default function LayoutApp({children}) {
             </Box>
             <DrawerFiles />
             <DrawerSnippets />
-            <IAButton />
             <MainContent>
                 {children}
             </MainContent>

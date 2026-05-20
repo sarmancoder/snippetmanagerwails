@@ -2,6 +2,7 @@ import { Box, Typography } from '@mui/material';
 import { useAppContext } from './AppSnippetsContext';
 import DualEditorPage from './components/DualEditorPage';
 import { useMemo } from 'react';
+import IAButton from './components/IAButton';
 
 function App() {
     const {currentSnippetKey} = useAppContext()
@@ -17,6 +18,7 @@ function App() {
             }}>
                 <DualEditorPage />
             </Box>
+            <IAButton />
             <Box sx={{
                 display: !isSnippetSelected ? 'none' : 'flex',
                 justifyContent: 'center',

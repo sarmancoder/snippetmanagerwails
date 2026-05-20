@@ -39,8 +39,8 @@ const initialState: SnippetState = {
 }
 
 export default function DualEditorPage() {
-    const loadingSnippetRef = useRef(false)
     const { snippetsList, currentSnippetKey, activeSnippet, setSnippetEditing, setsaved } = useAppContext()
+    const loadingSnippetRef = useRef(false)
 
     const bodyEditor = useRef<any>(null)
     const jsonResultRef = useRef<any>(null)
