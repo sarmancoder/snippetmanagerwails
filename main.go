@@ -1,8 +1,10 @@
 package main
 
 import (
-	"embed"
 	"context"
+	"embed"
+	"snippetmanagerwails/ia"
+
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -15,6 +17,7 @@ func main() {
 	// Create an instance of the app structure
 	app := NewApp()
 	archivos := &AdministradorArchivos{}
+	iaOllama := &ia.IAOllama{}
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -26,12 +29,13 @@ func main() {
 		},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup: func(ctx context.Context) {
-            app.startup(ctx)
-            archivos.SetContext(ctx) // <--- ¡IMPORTANTE! Le pasamos el contexto
-        },
+			app.startup(ctx)
+			archivos.SetContext(ctx) // <--- ¡IMPORTANTE! Le pasamos el contexto
+		},
 		Bind: []interface{}{
 			app,
 			archivos,
+			iaOllama,
 		},
 	})
 
